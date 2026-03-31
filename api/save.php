@@ -67,6 +67,14 @@ if (isset($input['_delete']) && $input['_delete']) {
     // 削除: 関連画像ファイルも削除
     if (isset($data[$id])) {
         $lp = $data[$id];
+        // CTA画像を削除
+        if (isset($lp['cta']['image']) && $lp['cta']['image']) {
+            $ctaPath = __DIR__ . '/../' . $lp['cta']['image'];
+            if (file_exists($ctaPath) && strpos(realpath($ctaPath), realpath($uploadsDir)) === 0) {
+                unlink($ctaPath);
+            }
+        }
+        // ステップ画像を削除
         if (isset($lp['steps']) && is_array($lp['steps'])) {
             foreach ($lp['steps'] as $step) {
                 if (isset($step['image']) && $step['image']) {

@@ -130,14 +130,23 @@ window.LPCats.Store = (function () {
     function uploadImage(file) {
         var formData = new FormData();
         formData.append('image', file);
+        console.log('[Store] upload', file.name, file.size);
 
         return fetch(API_BASE + 'upload.php', {
             method: 'POST',
             body: formData
         }).then(function (res) {
+            console.log('[Store] upload response', res.status);
             if (!res.ok) {
-                return res.json().then(function (err) {
-                    throw new Error(err.error || 'アップロードエラー');
+                return res.text().then(function (text) {
+                    console.error('[Store] upload error', res.status, text);
+                    try {
+                        var err = JSON.parse(text);
+                        throw new Error(err.error || 'アップロードエラー');
+                    } catch (e) {
+                        if (e.message.indexOf('アップロード') !== -1) throw e;
+                        throw new Error('アップロードエラー (' + res.status + ')');
+                    }
                 });
             }
             return res.json();

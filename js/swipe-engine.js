@@ -66,28 +66,31 @@ window.LPCats.SwipeEngine = (function () {
         _wheelHandler = function (e) {
             if (isScrolling) { e.preventDefault(); return; }
 
-            var direction = _container.dataset.direction;
-            var delta = direction === 'vertical' ? e.deltaY : e.deltaX;
+            var direction = _container.dataset.direction || 'vertical';
 
-            // 横スワイプ時に縦ホイールも受け付ける
-            if (direction === 'horizontal' && Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+            // 横スワイプ時は縦ホイールを横方向として解釈
+            var delta;
+            if (direction === 'horizontal') {
+                delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+            } else {
                 delta = e.deltaY;
             }
 
             if (Math.abs(delta) < 10) return;
 
-            isScrolling = true;
             e.preventDefault();
 
             var nextIndex = delta > 0
                 ? Math.min(_currentIndex + 1, _totalSteps - 1)
                 : Math.max(_currentIndex - 1, 0);
 
-            if (nextIndex !== _currentIndex) {
-                _scrollToStep(nextIndex);
-            }
+            console.log('[SwipeEngine] wheel', { direction: direction, delta: delta, current: _currentIndex, next: nextIndex });
 
-            setTimeout(function () { isScrolling = false; }, 600);
+            if (nextIndex !== _currentIndex) {
+                isScrolling = true;
+                _scrollToStep(nextIndex);
+                setTimeout(function () { isScrolling = false; }, 800);
+            }
         };
         _container.addEventListener('wheel', _wheelHandler, { passive: false });
     }
@@ -120,7 +123,18 @@ window.LPCats.SwipeEngine = (function () {
         var steps = _container.querySelectorAll('.lp-step');
         if (!steps[index]) return;
         console.log('[SwipeEngine] scrollToStep', index);
-        steps[index].scrollIntoView({ behavior: 'smooth' });
+
+        var direction = _container.dataset.direction || 'vertical';
+
+        if (direction === 'horizontal') {
+            // 横スクロール: container.scrollToで直接制御（scrollIntoViewはページ全体に影響する）
+            var stepWidth = _container.clientWidth;
+            _container.scrollTo({ left: stepWidth * index, behavior: 'smooth' });
+        } else {
+            // 縦/全画面: container.scrollToで直接制御
+            var stepHeight = _container.clientHeight;
+            _container.scrollTo({ top: stepHeight * index, behavior: 'smooth' });
+        }
     }
 
     function _createIndicator() {

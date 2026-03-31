@@ -479,7 +479,7 @@ window.LPCats.AdminApp = (function () {
     // === 埋め込みタブ ===
     function _showEmbed(lp) {
         var app = document.getElementById('app');
-        var baseUrl = window.location.origin + window.location.pathname.replace(/admin\.html.*$/, '');
+        var baseUrl = window.location.origin + window.location.pathname.replace(/(admin|index)\.html.*$/, '');
         var embedTag = '<script src="' + baseUrl + 'api/embed.php?id=' + lp.id + '"><\/script>';
         var embedTagMobile = '<script src="' + baseUrl + 'api/embed.php?id=' + lp.id + '&mobile=1"><\/script>';
 

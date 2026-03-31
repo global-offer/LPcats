@@ -208,8 +208,10 @@ echo <<<JS
         var scrolling = false;
         el.addEventListener('wheel', function(e) {
             if (scrolling) { e.preventDefault(); return; }
-            var delta = direction === 'vertical' ? e.deltaY : e.deltaX;
-            if (direction === 'horizontal' && Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+            var delta;
+            if (direction === 'horizontal') {
+                delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+            } else {
                 delta = e.deltaY;
             }
             if (Math.abs(delta) < 10) return;
@@ -219,13 +221,19 @@ echo <<<JS
                 ? Math.min(currentStep + 1, steps.length - 1)
                 : Math.max(currentStep - 1, 0);
             if (next !== currentStep) goToStep(next);
-            setTimeout(function() { scrolling = false; }, 600);
+            setTimeout(function() { scrolling = false; }, 800);
         }, { passive: false });
     }
 
     function goToStep(index) {
         var stepEls = container.querySelectorAll('.lpcats-step');
-        if (stepEls[index]) stepEls[index].scrollIntoView({ behavior: 'smooth' });
+        if (!stepEls[index]) return;
+        var dir = container.dataset.direction || 'vertical';
+        if (dir === 'horizontal') {
+            container.scrollTo({ left: container.clientWidth * index, behavior: 'smooth' });
+        } else {
+            container.scrollTo({ top: container.clientHeight * index, behavior: 'smooth' });
+        }
     }
 
     function updateIndicator(index) {
@@ -293,8 +301,10 @@ echo <<<JS
         '.lpcats-container[data-direction="horizontal"]{overflow-y:hidden;overflow-x:scroll;' +
             'scroll-snap-type:x mandatory;display:flex}' +
         '.lpcats-container[data-direction="horizontal"] .lpcats-step{min-width:100%;flex-shrink:0}' +
-        '.lpcats-container[data-direction="horizontal"]{touch-action:pan-y}' +
-        '.lpcats-container[data-direction="vertical"]{touch-action:pan-x}' +
+        '.lpcats-container[data-direction="horizontal"] .lpcats-step img{width:auto!important;height:auto!important;max-width:100%;max-height:100%;object-fit:scale-down}' +
+        '.lpcats-container[data-direction="horizontal"]{touch-action:pan-x pinch-zoom}' +
+        '.lpcats-container[data-direction="vertical"]{touch-action:pan-y pinch-zoom}' +
+        '.lpcats-container[data-direction="fullscreen"]{touch-action:pan-y pinch-zoom}' +
         '.lpcats-container[data-direction="fullscreen"] .lpcats-step img{object-fit:cover}' +
         '.lpcats-step{width:100%;height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;' +
             'display:flex;align-items:center;justify-content:center;background:#0F0F0F}' +
