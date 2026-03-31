@@ -1,0 +1,309 @@
+/* LPcats - LP表示エンジン スタイル */
+
+html, body {
+    height: 100%;
+    height: 100dvh;
+    overflow: hidden;
+    overscroll-behavior: none;
+}
+
+/* === コンテナ共通 === */
+.lp-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: none;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.lp-container::-webkit-scrollbar {
+    display: none;
+}
+
+/* === 縦スワイプ（TikTok風） === */
+.lp-container[data-direction="vertical"] {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    scroll-snap-type: y mandatory;
+}
+
+.lp-container[data-direction="vertical"] .lp-step {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+}
+
+/* === 横スワイプ（Instagram風） === */
+.lp-container[data-direction="horizontal"] {
+    overflow-x: scroll;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    display: flex;
+}
+
+.lp-container[data-direction="horizontal"] .lp-step {
+    min-width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+}
+
+/* === 全画面表示（ECアプリ風） === */
+.lp-container[data-direction="fullscreen"] {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    scroll-snap-type: y mandatory;
+}
+
+.lp-container[data-direction="fullscreen"] .lp-step {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+}
+
+.lp-container[data-direction="fullscreen"] .lp-step img {
+    object-fit: cover;
+}
+
+/* タッチ操作: スワイプ方向を許可しつつブラウザジェスチャーを制限 */
+.lp-container[data-direction="horizontal"] {
+    touch-action: pan-x pinch-zoom;
+}
+
+.lp-container[data-direction="vertical"],
+.lp-container[data-direction="fullscreen"] {
+    touch-action: pan-y pinch-zoom;
+}
+
+/* === ステップ === */
+.lp-step {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg, #0F0F0F);
+    will-change: transform;
+}
+
+.lp-step img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    -webkit-user-drag: none;
+    user-select: none;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.lp-step img.loaded {
+    opacity: 1;
+}
+
+/* ステップ番号（デバッグ用、本番では非表示） */
+.lp-step .step-number {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.5);
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 10;
+}
+
+/* === CTA固定バー === */
+.cta-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px 16px calc(16px + var(--safe-area-bottom, 0px));
+    z-index: 100;
+    background: linear-gradient(transparent 0%, rgba(0, 0, 0, 0.4) 30%, rgba(0, 0, 0, 0.85) 100%);
+    pointer-events: none;
+}
+
+.cta-button {
+    display: block;
+    width: 100%;
+    padding: 18px;
+    border: none;
+    border-radius: 14px;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    pointer-events: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 40px rgba(255, 107, 53, 0.15);
+    animation: cta-pulse 2.5s ease-in-out infinite;
+    will-change: transform, box-shadow;
+}
+
+@keyframes cta-pulse {
+    0%, 100% {
+        transform: translateY(0);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 40px rgba(255, 107, 53, 0.15);
+    }
+    50% {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 28px rgba(0, 0, 0, 0.5), 0 0 60px rgba(255, 107, 53, 0.25);
+    }
+}
+
+.cta-button:hover {
+    animation: none;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+}
+
+.cta-button:active {
+    animation: none;
+    transform: scale(0.97);
+}
+
+/* === インジケーター === */
+.lp-indicator {
+    position: fixed;
+    z-index: 100;
+    display: flex;
+    gap: 8px;
+    pointer-events: auto;
+}
+
+/* 縦スワイプ: 右側に縦並び */
+body[data-direction="vertical"] .lp-indicator {
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    flex-direction: column;
+}
+
+/* 全画面: 右側に縦並び（縦と同じ） */
+body[data-direction="fullscreen"] .lp-indicator {
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    flex-direction: column;
+}
+
+/* 横スワイプ: 上部に横並び */
+body[data-direction="horizontal"] .lp-indicator {
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    flex-direction: row;
+}
+
+.indicator-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.25);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.indicator-dot.active {
+    background: #FFFFFF;
+}
+
+body[data-direction="vertical"] .indicator-dot.active,
+body[data-direction="fullscreen"] .indicator-dot.active {
+    height: 20px;
+}
+
+body[data-direction="horizontal"] .indicator-dot.active {
+    width: 20px;
+}
+
+.indicator-dot:hover {
+    background: rgba(255, 255, 255, 0.6);
+}
+
+/* === 空状態 === */
+.lp-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    height: 100dvh;
+    color: var(--color-text-secondary, #999999);
+    text-align: center;
+    padding: 40px;
+}
+
+.lp-empty-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.lp-empty-text {
+    font-size: 18px;
+    font-weight: 500;
+}
+
+/* === レスポンシブ: PC表示時はスマホ幅で中央表示 === */
+@media (min-width: 768px) {
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #000000;
+    }
+
+    .lp-wrapper {
+        position: relative;
+        width: 375px;
+        height: 100vh;
+        height: 100dvh;
+        overflow: hidden;
+        border-radius: 24px;
+        border: 3px solid #333;
+        box-shadow:
+            0 0 0 1px rgba(255, 255, 255, 0.05),
+            0 25px 80px rgba(0, 0, 0, 0.8),
+            0 0 120px rgba(0, 0, 0, 0.4);
+    }
+
+    .lp-container {
+        width: 375px;
+    }
+
+    .lp-container[data-direction="horizontal"] .lp-step {
+        min-width: 375px;
+    }
+
+    .cta-bar {
+        width: 375px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    body[data-direction="vertical"] .lp-indicator {
+        right: calc(50% - 375px / 2 - 24px);
+    }
+
+    body[data-direction="horizontal"] .lp-indicator {
+        /* 横は上部中央のまま */
+    }
+}
