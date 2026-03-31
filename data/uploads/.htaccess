@@ -1,0 +1,7 @@
+# PHPスクリプト実行を禁止（多層防御）
+Options -ExecCGI
+AddType text/plain .php .phtml .php3 .php5
+
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>

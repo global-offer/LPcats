@@ -1,0 +1,9 @@
+# projects.json への直接アクセスを禁止
+<Files "projects.json">
+    Require all denied
+</Files>
+
+# uploads/ ディレクトリの画像は許可（デフォルトで許可されるが明示）
+<FilesMatch "\.(jpg|jpeg|png|webp)$">
+    Require all granted
+</FilesMatch>
