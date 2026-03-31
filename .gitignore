@@ -1,0 +1,8 @@
+node_modules/
+dist/
+data/projects.json
+data/uploads/*
+data/analytics/*
+!data/uploads/.htaccess
+!data/analytics/.htaccess
+*.log
